@@ -84,6 +84,25 @@
             <option value="Teacher">Teacher</option>
         </select>
     </div>
+    
+    <div class="form-grid">
+    <input type="text" id="regSubject" placeholder="Subject (e.g. Math, Science)">
+
+    <select id="regGender">
+        <option value="" disabled selected>Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+</div>
+
+<select id="regPronouns" style="margin-top:10px;">
+    <option value="" disabled selected>Select Pronouns</option>
+    <option value="he/him">he/him</option>
+    <option value="she/her">she/her</option>
+    <option value="they/them">they/them</option>
+</select>
+
 
     <label style="display:block; margin-top:10px; font-size:0.9em; color:#555;">Profile Photo:</label>
     <input type="file" id="regPhoto" accept="image/*">
@@ -265,29 +284,11 @@ const firebaseConfig = {
           tbody.innerHTML += row;
       });
 
-      <div class="form-grid">
-    <input type="text" id="regSubject" placeholder="Subject (e.g. Math, Science)">
-
-    <select id="regGender">
-        <option value="" disabled selected>Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-    </select>
-</div>
-
-<select id="regPronouns" style="margin-top:10px;">
-    <option value="" disabled selected>Select Pronouns</option>
-    <option value="he/him">he/him</option>
-    <option value="she/her">she/her</option>
-    <option value="they/them">they/them</option>
-    
-      });
-    
 </select>
 </script>
 
 </body>
 </html>
+
 
 
