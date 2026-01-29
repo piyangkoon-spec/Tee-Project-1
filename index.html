@@ -114,6 +114,58 @@
     <option value="Prefer not to say">Prefer not to say</option>
 </select>
 
+    <hr style="margin:30px 0;">
+
+<h2>✏️ Edit Student Information</h2>
+
+<input type="text" id="editTag" placeholder="Scan RFID Tag to Edit">
+
+<div class="form-grid">
+    <input type="text" id="editName" placeholder="Full Name">
+    <select id="editGrade">
+        <option value="">Select Grade</option>
+        <option value="Grade 1">Grade 1</option>
+        <option value="Grade 2">Grade 2</option>
+        <option value="Grade 3">Grade 3</option>
+        <option value="Grade 4">Grade 4</option>
+        <option value="Grade 5">Grade 5</option>
+        <option value="Grade 6">Grade 6</option>
+        <option value="Teacher">Teacher</option>
+    </select>
+</div>
+
+<div class="form-grid">
+    <input type="text" id="editSubject" placeholder="Subject">
+    <select id="editGender">
+        <option value="">Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+</div>
+
+<div class="form-grid">
+    <select id="editPronouns">
+        <option value="">Pronouns</option>
+        <option value="he/him">he/him</option>
+        <option value="she/her">she/her</option>
+        <option value="they/them">they/them</option>
+    </select>
+
+    <select id="editReligion">
+        <option value="">Religion</option>
+        <option value="Buddhism">Buddhism</option>
+        <option value="Christianity">Christianity</option>
+        <option value="Islam">Islam</option>
+        <option value="Hinduism">Hinduism</option>
+        <option value="Other">Other</option>
+        <option value="Prefer not to say">Prefer not to say</option>
+    </select>
+</div>
+
+<button onclick="loadStudent()">Load Student</button>
+<button style="margin-top:10px; background:#2196F3;" onclick="updateStudent()">Save Changes</button>
+
 
     <label style="display:block; margin-top:10px; font-size:0.9em; color:#555;">Profile Photo:</label>
     <input type="file" id="regPhoto" accept="image/*">
@@ -300,9 +352,3 @@ const firebaseConfig = {
 
 </body>
 </html>
-
-
-
-
-
-
