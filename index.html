@@ -201,13 +201,16 @@
 
     // !!! IMPORTANT: REPLACE THESE VALUES WITH YOUR FIREBASE KEYS !!!
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY_HERE",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAphH-GPUsgbPiWGQgFXOiiLTaMLEc80qs",
+  authDomain: "rfid-project-26d4b.firebaseapp.com",
+  projectId: "rfid-project-26d4b",
+  storageBucket: "rfid-project-26d4b.firebasestorage.app",
+  messagingSenderId: "943488412381",
+  appId: "1:943488412381:web:b8f68b506744290f658934",
+  measurementId: "G-H3BYERRXV7"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -383,3 +386,4 @@
 
 </body>
 </html>
+
