@@ -1,364 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School RFID Attendance V3</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f0f2f5; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1, h2 { color: #2c3e50; text-align: center; margin-bottom: 1.5rem; }
-        
-        /* Input Styling */
-        .form-group { margin-bottom: 10px; }
-        input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #e1e4e8; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        input[type="text"]:focus, select:focus { border-color: #4CAF50; outline: none; }
-        
-        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.2s; }
-        button:hover { background-color: #45a049; }
-        
-        /* Status Messages */
-        #status { margin-top: 1rem; padding: 15px; border-radius: 6px; text-align: center; display: none; font-weight: bold; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School RFID Attendance V3</title>
 
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
-        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        th { background-color: #4CAF50; color: white; border-radius: 6px 6px 0 0; }
-        tr:last-child td { border-bottom: none; }
-        
-        /* Profile Image Styles */
-        .profile-pic { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
-        .no-pic { width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #999; }
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    background-color: #f0f2f5;
+}
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 6px;
+    border: 2px solid #e1e4e8;
+}
+button {
+    width: 100%;
+    padding: 14px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+button:hover { background: #45a049; }
+.admin-box { border: 2px dashed #cbd5e0; background: #f8fafc; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:600px){ .form-grid{grid-template-columns:1fr;} }
 
-        /* Admin Section Style */
-        .admin-box { border: 2px dashed #cbd5e0; background-color: #f8fafc; }
-        .admin-title { color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 15px; }
-        
-        /* Grid for Form */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-    </style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+th { background: #4CAF50; color: white; }
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.no-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#status {
+    margin-top: 10px;
+    padding: 10px;
+    text-align: center;
+    display: none;
+    font-weight: bold;
+}
+.success { background: #d4edda; color: #155724; }
+.error { background: #f8d7da; color: #721c24; }
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <h1>🏫 Daily Attendance Check-in</h1>
-    
-    <p style="text-align:center; color:#666;">Click the box below and scan your card.</p>
-    <input type="text" id="attendanceInput" placeholder="Scan RFID tag here..." autofocus autocomplete="off">
-    
-    <div id="status"></div>
+<h1>🏫 Daily Attendance</h1>
+<input type="text" id="attendanceInput" placeholder="Scan RFID tag">
+<div id="status"></div>
 
-    <h3>🕒 Today's Live Log</h3>
-    <table id="attendanceTable">
-        <thead>
-            <tr>
-                <th>Photo</th>
-                <th>Time</th>
-                <th>Name</th>
-                <th>Grade</th>
-                <th>ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
+<table id="attendanceTable">
+<thead>
+<tr>
+<th>Photo</th>
+<th>Time</th>
+<th>Name</th>
+<th>Grade</th>
+<th>ID</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
 </div>
 
 <div class="container admin-box">
-    <div class="admin-title">Teacher Control Panel</div>
-    <h2>➕ Register New Student</h2>
-    
-    <div class="form-grid">
-        <input type="text" id="regName" placeholder="Full Name (e.g. Somchai)">
-        <select id="regGrade">
-            <option value="" disabled selected>Select Grade</option>
-            <option value="Grade 1">Grade 1</option>
-            <option value="Grade 2">Grade 2</option>
-            <option value="Grade 3">Grade 3</option>
-            <option value="Grade 4">Grade 4</option>
-            <option value="Grade 5">Grade 5</option>
-            <option value="Grade 6">Grade 6</option>
-            <option value="Teacher">Teacher</option>
-        </select>
-    </div>
-    
-    <div class="form-grid">
-    <input type="text" id="regSubject" placeholder="Subject (e.g. Math, Science)">
+<h2>➕ Register Student</h2>
 
-    <select id="regGender">
-        <option value="" disabled selected>Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-    </select>
+<div class="form-grid">
+<input id="regName" placeholder="Full Name">
+<select id="regGrade">
+<option value="">Grade</option>
+<option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+<option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+<option>Teacher</option>
+</select>
 </div>
 
-<select id="regPronouns" style="margin-top:10px;">
-    <option value="" disabled selected>Select Pronouns</option>
-    <option value="he/him">He/Him</option>
-    <option value="she/her">She/Her</option>
-    <option value="It">It</option>
-    <option value="they/them">They/Them</option>
+<div class="form-grid">
+<input id="regSubject" placeholder="Subject">
+<select id="regGender">
+<option value="">Gender</option>
+<option>Male</option><option>Female</option><option>Other</option>
+</select>
+</div>
+
+<select id="regPronouns">
+<option value="">Pronouns</option>
+<option>he/him</option>
+<option>she/her</option>
+<option>they/them</option>
 </select>
 
 <select id="regReligion">
-    <option value="" disabled selected>Select Religion</option>
-    <option value="Buddhism">Buddhism</option>
-    <option value="Christianity">Christianity</option>
-    <option value="Islam">Islam</option>
-    <option value="Hinduism">Hinduism</option>
-    <option value="Other">Other</option>
-    <option value="Prefer not to say">Prefer not to say</option>
+<option value="">Religion</option>
+<option>Buddhism</option>
+<option>Christianity</option>
+<option>Islam</option>
+<option>Hinduism</option>
+<option>Other</option>
+<option>Prefer not to say</option>
 </select>
 
-    <hr style="margin:30px 0;">
+<input type="file" id="regPhoto">
+<input id="regTag" placeholder="Scan RFID to register">
 
-    <label style="display:block; margin-top:10px; font-size:0.9em; color:#555;">Profile Photo:</label>
-    <input type="file" id="regPhoto" accept="image/*">
+<button onclick="registerStudent()">Save Student</button>
 
-    <input type="text" id="regTag" placeholder="Click here & Scan Card to Register..." style="background-color: #fffde7;">
-    
-    <button onclick="registerStudent()">Save Student Profile</button>
-</div>
+<hr>
 
-<h2>✏️ Edit Student Information</h2>
-
-<input type="text" id="editTag" placeholder="Scan RFID Tag to Edit">
+<h2>✏️ Edit Student</h2>
+<input id="editTag" placeholder="Scan RFID to edit">
 
 <div class="form-grid">
-    <input type="text" id="editName" placeholder="Full Name">
-    <select id="editGrade">
-        <option value="">Select Grade</option>
-        <option value="Grade 1">Grade 1</option>
-        <option value="Grade 2">Grade 2</option>
-        <option value="Grade 3">Grade 3</option>
-        <option value="Grade 4">Grade 4</option>
-        <option value="Grade 5">Grade 5</option>
-        <option value="Grade 6">Grade 6</option>
-        <option value="Teacher">Teacher</option>
-    </select>
+<input id="editName" placeholder="Full Name">
+<select id="editGrade">
+<option value="">Grade</option>
+<option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+<option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+<option>Teacher</option>
+</select>
 </div>
 
 <div class="form-grid">
-    <input type="text" id="editSubject" placeholder="Subject">
-    <select id="editGender">
-        <option value="">Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-    </select>
+<input id="editSubject" placeholder="Subject">
+<select id="editGender">
+<option value="">Gender</option>
+<option>Male</option><option>Female</option><option>Other</option>
+</select>
 </div>
 
 <div class="form-grid">
-    <select id="editPronouns">
-        <option value="">Pronouns</option>
-        <option value="he/him">he/him</option>
-        <option value="she/her">she/her</option>
-        <option value="they/them">they/them</option>
-    </select>
-
-    <select id="editReligion">
-        <option value="">Religion</option>
-        <option value="Buddhism">Buddhism</option>
-        <option value="Christianity">Christianity</option>
-        <option value="Islam">Islam</option>
-        <option value="Hinduism">Hinduism</option>
-        <option value="Other">Other</option>
-        <option value="Prefer not to say">Prefer not to say</option>
-    </select>
+<select id="editPronouns">
+<option value="">Pronouns</option>
+<option>he/him</option><option>she/her</option><option>they/them</option>
+</select>
+<select id="editReligion">
+<option value="">Religion</option>
+<option>Buddhism</option><option>Christianity</option><option>Islam</option>
+<option>Hinduism</option><option>Other</option><option>Prefer not to say</option>
+</select>
 </div>
 
-<button onclick="loadStudent()">Load Student</button>
-<button style="margin-top:10px; background:#2196F3;" onclick="updateStudent()">Save Changes</button>
-
-
-    <label style="display:block; margin-top:10px; font-size:0.9em; color:#555;">Profile Photo:</label>
-    <input type="file" id="regPhoto" accept="image/*">
-
-    <input type="text" id="regTag" placeholder="Click here & Scan Card to Register..." style="background-color: #fffde7;">
-    
-    <button onclick="registerStudent()">Save Student Profile</button>
+<button onclick="loadStudent()">Load</button>
+<button onclick="updateStudent()" style="background:#2196F3;">Save Changes</button>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, query, orderBy, limit, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, setDoc, doc,
+  getDoc, updateDoc, onSnapshot, query, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // --- PASTE YOUR FIREBASE CONFIG HERE ---
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAphH-GPUsgbPiWGQgFXOiiLTaMLEc80qs",
-  authDomain: "rfid-project-26d4b.firebaseapp.com",
-  projectId: "rfid-project-26d4b",
-  storageBucket: "rfid-project-26d4b.firebasestorage.app",
-  messagingSenderId: "943488412381",
-  appId: "1:943488412381:web:b8f68b506744290f658934",
-  measurementId: "G-H3BYERRXV7"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
 };
-  // ----------------------------------------
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  // --- 1. HELPER: CONVERT IMAGE TO BASE64 ---
-  const toBase64 = file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-  });
+let studentDirectory = {};
 
-  // --- 2. STUDENT DIRECTORY (The "Phonebook") ---
-  // Now stores Name, Grade, AND Photo
-  let studentDirectory = {}; 
+onSnapshot(collection(db,"students"), snap=>{
+    studentDirectory = {};
+    snap.forEach(d=>{
+        studentDirectory[d.id]=d.data();
+    });
+});
 
-  onSnapshot(collection(db, "students"), (snapshot) => {
-      snapshot.forEach((doc) => {
-          const d = doc.data();
-          studentDirectory[doc.id] = {
-              name: d.name,
-              grade: d.grade || "N/A",
-              photo: d.photo || null // Base64 string
-          };
-      });
-      console.log("Directory updated:", Object.keys(studentDirectory).length + " students loaded.");
-  });
+const toBase64 = f => new Promise(r=>{
+    const reader=new FileReader();
+    reader.onload=()=>r(reader.result);
+    reader.readAsDataURL(f);
+});
 
-  // --- 3. REGISTRATION LOGIC ---
-  window.registerStudent = async function() {
-      const name = document.getElementById('regName').value.trim();
-      const grade = document.getElementById('regGrade').value;
-      const tagId = document.getElementById('regTag').value.trim();
-      const photoFile = document.getElementById('regPhoto').files[0];
+window.registerStudent = async ()=>{
+    const tag = regTag.value.trim();
+    if(!tag) return alert("Scan RFID");
 
-      if (!name || !tagId || !grade) {
-          alert("Please fill in Name, Grade, and Scan a Tag!");
-          return;
-      }
+    let photo=null;
+    if(regPhoto.files[0]) photo = await toBase64(regPhoto.files[0]);
 
-      // Check if file is too big (Optional safety check: Limit to 500KB)
-      if (photoFile && photoFile.size > 500 * 1024) {
-          alert("Photo is too large! Please use a smaller image (under 500KB).");
-          return;
-      }
+    await setDoc(doc(db,"students",tag),{
+        name: regName.value,
+        grade: regGrade.value,
+        subject: regSubject.value,
+        gender: regGender.value,
+        pronouns: regPronouns.value,
+        religion: regReligion.value,
+        photo,
+        registeredAt: serverTimestamp()
+    });
+    alert("Student saved");
+};
 
-      let photoBase64 = null;
-      if (photoFile) {
-          try {
-              photoBase64 = await toBase64(photoFile);
-          } catch(e) {
-              console.error("Error processing image", e);
-              alert("Error processing image file.");
-              return;
-          }
-      }
+window.loadStudent = async ()=>{
+    const snap = await getDoc(doc(db,"students",editTag.value));
+    if(!snap.exists()) return alert("Not found");
+    const d = snap.data();
+    editName.value=d.name||"";
+    editGrade.value=d.grade||"";
+    editSubject.value=d.subject||"";
+    editGender.value=d.gender||"";
+    editPronouns.value=d.pronouns||"";
+    editReligion.value=d.religion||"";
+};
 
-      try {
-          // Save all details to 'students' collection
-          await setDoc(doc(db, "students", tagId), {
-              name: name,
-              grade: grade,
-              photo: photoBase64, // Storing the image string directly
-              registeredAt: serverTimestamp()
-          });
-          
-          alert(`✅ Success! ${name} (${grade}) registered.`);
-          // Clear inputs
-          document.getElementById('regName').value = '';
-          document.getElementById('regGrade').value = '';
-          document.getElementById('regTag').value = '';
-          document.getElementById('regPhoto').value = ''; // Reset file input
-      } catch (e) {
-          console.error("Error: ", e);
-          alert("❌ Error registering student.");
-      }
-  }
+window.updateStudent = async ()=>{
+    await updateDoc(doc(db,"students",editTag.value),{
+        name: editName.value,
+        grade: editGrade.value,
+        subject: editSubject.value,
+        gender: editGender.value,
+        pronouns: editPronouns.value,
+        religion: editReligion.value,
+        updatedAt: serverTimestamp()
+    });
+    alert("Updated");
+};
 
-  // --- 4. ATTENDANCE LOGIC ---
-  const attendanceInput = document.getElementById('attendanceInput');
-  const statusDiv = document.getElementById('status');
+attendanceInput.addEventListener("keypress", async e=>{
+    if(e.key==="Enter"){
+        const id = attendanceInput.value.trim();
+        const s = studentDirectory[id];
+        await addDoc(collection(db,"attendance"),{
+            tag_id:id,
+            student_name:s?.name||"Unknown",
+            student_grade:s?.grade||"",
+            student_photo:s?.photo||null,
+            timestamp:serverTimestamp()
+        });
+        attendanceInput.value="";
+    }
+});
 
-  attendanceInput.addEventListener('keypress', async (e) => {
-      if (e.key === 'Enter') {
-          const tagId = attendanceInput.value.trim();
-          if (tagId) {
-              await markAttendance(tagId);
-              attendanceInput.value = ''; 
-          }
-      }
-  });
-
-  async function markAttendance(id) {
-      // Look up student details
-      const student = studentDirectory[id];
-      
-      const studentName = student ? student.name : "Unknown Student";
-      const studentGrade = student ? student.grade : "--";
-      const studentPhoto = student ? student.photo : null;
-
-      try {
-          await addDoc(collection(db, "attendance"), {
-              tag_id: id,
-              student_name: studentName,
-              student_grade: studentGrade,
-              student_photo: studentPhoto, // We snapshot the photo so logs keep working even if profile changes
-              timestamp: serverTimestamp()
-          });
-          
-          if(student) {
-              showStatus(`✅ Welcome, ${studentName}!`, "success");
-          } else {
-              showStatus(`⚠️ Unregistered Tag: ${id}`, "error");
-          }
-      } catch (e) {
-          console.error(e);
-          showStatus("❌ System Error.", "error");
-      }
-  }
-
-  function showStatus(msg, type) {
-      statusDiv.textContent = msg;
-      statusDiv.className = type;
-      statusDiv.style.display = 'block';
-      setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
-  }
-
-  // --- 5. SHOW TABLE ---
-  const q = query(collection(db, "attendance"), orderBy("timestamp", "desc"), limit(10));
-  
-  onSnapshot(q, (snapshot) => {
-      const tbody = document.querySelector('#attendanceTable tbody');
-      tbody.innerHTML = ''; 
-      
-      snapshot.forEach((doc) => {
-          const data = doc.data();
-          let dateStr = "Just now";
-          if (data.timestamp) dateStr = data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-          // Handle Photo Logic
-          let imgHtml = `<div class="no-pic">?</div>`;
-          if (data.student_photo) {
-              imgHtml = `<img src="${data.student_photo}" class="profile-pic">`;
-          }
-
-          const row = `<tr>
-              <td>${imgHtml}</td>
-              <td>${dateStr}</td>
-              <td style="font-weight:bold; color:#333;">${data.student_name || "Unknown"}</td>
-              <td><span style="background:#e8f5e9; padding:4px 8px; border-radius:10px; font-size:0.85em; color:#2e7d32;">${data.student_grade || "N/A"}</span></td>
-              <td style="color:#999; font-size:0.85em;">${data.tag_id}</td>
-          </tr>`;
-          tbody.innerHTML += row;
-      });
-
-</select>
+const q = query(collection(db,"attendance"),orderBy("timestamp","desc"),limit(10));
+onSnapshot(q,snap=>{
+    const tb=document.querySelector("#attendanceTable tbody");
+    tb.innerHTML="";
+    snap.forEach(d=>{
+        const x=d.data();
+        tb.innerHTML+=`
+        <tr>
+        <td>${x.student_photo?`<img class="profile-pic" src="${x.student_photo}">`:`<div class="no-pic">?</div>`}</td>
+        <td>${x.timestamp?.toDate().toLocaleTimeString()||""}</td>
+        <td>${x.student_name}</td>
+        <td>${x.student_grade}</td>
+        <td>${x.tag_id}</td>
+        </tr>`;
+    });
+});
 </script>
 
 </body>
 </html>
-
-
